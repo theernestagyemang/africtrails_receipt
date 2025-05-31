@@ -105,6 +105,14 @@
         margin-right: 10px;
       }
     }
+    @media print {
+      button,
+      .buttons,
+      td button {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body onload="generateReceiptNumber()">
