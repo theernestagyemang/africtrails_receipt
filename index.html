@@ -239,8 +239,9 @@ function downloadPDF(callback) {
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
   }).from(element).toPdf().get('pdf').then(function (pdf) {
     if (callback) callback(pdf);
-  });
+  }).save();
 }
+
 
 calculate();
 </script>
