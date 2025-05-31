@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AfricTrails Receipt</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("5i3iC-RcgiYWawOe8"); // your actual public key
+    })();
+  </script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -134,7 +140,7 @@
   <div class="row">
     <div>
       <label>Customer Name</label>
-      <input type="text" id="billTo" placeholder="Enter customer name">
+      <input type="text" id="customerName" placeholder="Enter customer name">
     </div>
     <div>
       <label>Customer Email</label>
@@ -244,29 +250,46 @@ function downloadPDF(callback) {
   });
 }
 
-async function sendEmail() {
+function sendEmail() {
   const email = document.getElementById("customerEmail").value;
-  if (!email) return alert("Please enter the customer's email.");
+  const name = document.getElementById("customerName").value;
+
+  if (!email || !name) {
+    return alert("Please enter the customer's name and email.");
+  }
 
   downloadPDF(async function(pdf) {
     const blob = pdf.output('blob');
-    const formData = new FormData();
-    formData.append('file', blob, 'receipt.pdf');
-    formData.append('email', email);
+    const reader = new FileReader();
 
-    const response = await fetch("YOUR_EMAIL_BACKEND_ENDPOINT", {
-      method: "POST",
-      body: formData
-    });
-    const result = await response.text();
-    alert("Email sent: " + result);
+    reader.onload = async function() {
+      const base64 = reader.result.split(',')[1];
+
+      const templateParams = {
+        to_email: email,
+        to_name: name,
+        message: "Attached is your AfricTrails receipt.",
+        attachment: base64
+      };
+
+      try {
+        const response = await emailjs.send("service_jh3bd89", "template_vujdmit", templateParams);
+        alert("Email sent successfully!");
+      } catch (error) {
+        console.error("Email error:", error);
+        alert("Failed to send email.");
+      }
+    };
+
+    reader.readAsDataURL(blob);
   });
 }
+
 
 async function saveToSheet() {
   const receiptNo = document.getElementById("receiptNo").value;
   const receiptDate = document.getElementById("receiptDate").value;
-  const customerName = document.getElementById("billTo").value;
+  const customerName = document.getElementById("customerName").value;
   const customerEmail = document.getElementById("customerEmail").value;
   const customerAddress = document.getElementById("customerAddress").value;
   const rows = document.querySelectorAll("#itemsBody tr");
