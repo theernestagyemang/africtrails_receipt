@@ -43,8 +43,14 @@
 
     .row {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       margin-bottom: 15px;
+    }
+
+    .row > div {
+      flex: 1 1 100%;
+      margin-bottom: 10px;
     }
 
     label {
@@ -58,10 +64,15 @@
       box-sizing: border-box;
     }
 
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      min-width: 600px;
     }
 
     table th, table td {
@@ -106,6 +117,13 @@
     .buttons button:hover {
       background: #0056b3;
     }
+
+    @media screen and (min-width: 600px) {
+      .row > div {
+        flex: 1;
+        margin-right: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -126,47 +144,49 @@
   </div>
 
   <div class="row">
-    <div style="flex: 1; margin-right: 10px;">
+    <div>
       <label>Receipt #</label>
       <input type="text" id="receiptNo" value="09876543">
     </div>
-    <div style="flex: 1;">
+    <div>
       <label>Receipt Date</label>
       <input type="date" id="receiptDate" value="2025-05-01">
     </div>
   </div>
 
   <div class="row">
-    <div style="flex: 1;">
+    <div>
       <label>Bill To</label>
       <textarea id="billTo" placeholder="Enter client details here...">Ghana</textarea>
     </div>
   </div>
 
-  <table id="itemsTable">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Item Description</th>
-        <th>Qty</th>
-        <th>Rate</th>
-        <th>TAX</th>
-        <th>Amount</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="itemsBody">
-      <tr>
-        <td>1</td>
-        <td><input type="text" value="Cape Coast Trip"></td>
-        <td><input type="number" value="1" onchange="calculate()"></td>
-        <td><input type="number" value="400.00" onchange="calculate()"></td>
-        <td><input type="number" value="0.00" onchange="calculate()"></td>
-        <td class="amount">400.00</td>
-        <td><button onclick="removeRow(this)">❌</button></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="itemsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Item Description</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>TAX</th>
+          <th>Amount</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody">
+        <tr>
+          <td>1</td>
+          <td><input type="text" value="Cape Coast Trip"></td>
+          <td><input type="number" value="1" onchange="calculate()"></td>
+          <td><input type="number" value="400.00" onchange="calculate()"></td>
+          <td><input type="number" value="0.00" onchange="calculate()"></td>
+          <td class="amount">400.00</td>
+          <td><button onclick="removeRow(this)">❌</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <button onclick="addRow()">Add Item</button>
 
