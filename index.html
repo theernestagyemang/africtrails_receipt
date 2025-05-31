@@ -5,12 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AfricTrails Receipt</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("5i3iC-RcgiYWawOe8"); // your actual public key
-    })();
-  </script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -190,8 +184,6 @@
 <div class="buttons">
   <button onclick="window.print()">🖨️ Print</button>
   <button onclick="downloadPDF()">📄 Export as PDF</button>
-  <button onclick="saveToSheet()">💾 Save to Google Sheet</button>
-  <button onclick="sendEmail()">✉️ Email Receipt</button>
 </div>
 <script>
 function generateReceiptNumber() {
@@ -248,86 +240,6 @@ function downloadPDF(callback) {
   }).from(element).toPdf().get('pdf').then(function (pdf) {
     if (callback) callback(pdf);
   });
-}
-
-function sendEmail() {
-  const email = document.getElementById("customerEmail").value;
-  const name = document.getElementById("customerName").value;
-
-  if (!email || !name) {
-    return alert("Please enter the customer's name and email.");
-  }
-
-  downloadPDF(async function(pdf) {
-    const blob = pdf.output('blob');
-    const reader = new FileReader();
-
-    reader.onload = async function() {
-      const base64 = reader.result.split(',')[1];
-
-      const templateParams = {
-        to_email: email,
-        to_name: name,
-        message: "Attached is your AfricTrails receipt.",
-        attachment: base64
-      };
-
-      try {
-        const response = await emailjs.send("service_jh3bd89", "template_vujdmit", templateParams);
-        alert("Email sent successfully!");
-      } catch (error) {
-        console.error("Email error:", error);
-        alert("Failed to send email.");
-      }
-    };
-
-    reader.readAsDataURL(blob);
-  });
-}
-
-
-async function saveToSheet() {
-  const receiptNo = document.getElementById("receiptNo").value;
-  const receiptDate = document.getElementById("receiptDate").value;
-  const customerName = document.getElementById("customerName").value;
-  const customerEmail = document.getElementById("customerEmail").value;
-  const customerAddress = document.getElementById("customerAddress").value;
-  const rows = document.querySelectorAll("#itemsBody tr");
-  const items = [];
-  rows.forEach(row => {
-    const desc = row.cells[1].querySelector('input').value;
-    const qty = row.cells[2].querySelector('input').value;
-    const rate = row.cells[3].querySelector('input').value;
-    const tax = row.cells[4].querySelector('input').value;
-    const amount = row.cells[5].innerText;
-    items.push({ desc, qty, rate, tax, amount });
-  });
-  const subTotal = document.getElementById("subTotal").innerText;
-  const total = document.getElementById("total").innerText;
-  const data = {
-    receiptNo,
-    receiptDate,
-    customerName,
-    customerEmail,
-    customerAddress,
-    items,
-    subTotal,
-    total
-  };
-  try {
-
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbyRN4InF9MJEnbr60RXw9QMxKUieCRkDhq_JkkK3QCB59bdUpbodYKCXneJ_XAxgo2Lyg/exec";
-  const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(scriptUrl);
-  
-  fetch(corsUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ test: "data" })
-  })
-  .then(res => res.text())
-  .then(console.log)
-  .catch(console.error);
-
 }
 
 calculate();
