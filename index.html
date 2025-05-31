@@ -315,18 +315,19 @@ async function saveToSheet() {
     total
   };
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyRN4InF9MJEnbr60RXw9QMxKUieCRkDhq_JkkK3QCB59bdUpbodYKCXneJ_XAxgo2Lyg/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-    const text = await response.text();
-    alert("Saved to sheet: " + text);
-  } catch (error) {
-    alert("Error saving data: " + error);
-  }
+
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbyRN4InF9MJEnbr60RXw9QMxKUieCRkDhq_JkkK3QCB59bdUpbodYKCXneJ_XAxgo2Lyg/exec";
+  const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(scriptUrl);
+  
+  fetch(corsUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ test: "data" })
+  })
+  .then(res => res.text())
+  .then(console.log)
+  .catch(console.error);
+
 }
 
 calculate();
