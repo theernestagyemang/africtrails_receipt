@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AfricTrails Receipt</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    .receipt-container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      max-height: 80px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .company-details {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    table th {
+      background: #f0f0f0;
+    }
+
+    .totals {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .totals label {
+      font-weight: bold;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .buttons button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .buttons button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="receipt-container" id="receiptContent">
+  <div class="header">
+    <img src="./africtrails_logo.png" alt="AfricTrails Logo">
+  </div>
+
+  <h2>AfricTrails Receipt</h2>
+
+  <div class="company-details">
+    <p><strong>AfricTrails</strong><br>
+    East Legon - Accra<br>
+    Greater Accra, Ghana<br>
+    africtrails@gmail.com<br>
+    Follow us on all social media @africtrails</p>
+  </div>
+
+  <div class="row">
+    <div style="flex: 1; margin-right: 10px;">
+      <label>Receipt #</label>
+      <input type="text" id="receiptNo" value="09876543">
+    </div>
+    <div style="flex: 1;">
+      <label>Receipt Date</label>
+      <input type="date" id="receiptDate" value="2025-05-01">
+    </div>
+  </div>
+
+  <div class="row">
+    <div style="flex: 1;">
+      <label>Bill To</label>
+      <textarea id="billTo" placeholder="Enter client details here...">Ghana</textarea>
+    </div>
+  </div>
+
+  <table id="itemsTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Description</th>
+        <th>Qty</th>
+        <th>Rate</th>
+        <th>TAX</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody">
+      <tr>
+        <td>1</td>
+        <td><input type="text" value="Cape Coast Trip"></td>
+        <td><input type="number" value="1" onchange="calculate()"></td>
+        <td><input type="number" value="400.00" onchange="calculate()"></td>
+        <td><input type="number" value="0.00" onchange="calculate()"></td>
+        <td class="amount">400.00</td>
+        <td><button onclick="removeRow(this)">❌</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button onclick="addRow()">Add Item</button>
+
+  <div class="totals">
+    <p><label>Sub Total: ¢</label><span id="subTotal">400.00</span></p>
+    <p><label>TOTAL: ¢</label><span id="total">400.00</span></p>
+  </div>
+
+  <div class="footer">
+    <p><strong>Notes:</strong> It was great doing business with you.</p>
+    <p><strong>Terms & Conditions:</strong> Please make the payment by the due date.</p>
+  </div>
+</div>
+
+<div class="buttons">
+  <button onclick="window.print()">🖨️ Print</button>
+  <button onclick="downloadPDF()">📄 Export as PDF</button>
+</div>
+
+<script>
+  function calculate() {
+    const rows = document.querySelectorAll("#itemsBody tr");
+    let subtotal = 0;
+    rows.forEach((row, index) => {
+      const qty = parseFloat(row.cells[2].querySelector('input').value) || 0;
+      const rate = parseFloat(row.cells[3].querySelector('input').value) || 0;
+      const tax = parseFloat(row.cells[4].querySelector('input').value) || 0;
+      const amount = qty * rate + tax;
+      row.cells[5].innerText = amount.toFixed(2);
+      subtotal += amount;
+      row.cells[0].innerText = index + 1;
+    });
+    document.getElementById("subTotal").innerText = subtotal.toFixed(2);
+    document.getElementById("total").innerText = subtotal.toFixed(2);
+  }
+
+  function addRow() {
+    const table = document.getElementById("itemsBody");
+    const row = table.insertRow();
+    row.innerHTML = `
+      <td></td>
+      <td><input type="text" value=""></td>
+      <td><input type="number" value="1" onchange="calculate()"></td>
+      <td><input type="number" value="0.00" onchange="calculate()"></td>
+      <td><input type="number" value="0.00" onchange="calculate()"></td>
+      <td class="amount">0.00</td>
+      <td><button onclick="removeRow(this)">❌</button></td>
+    `;
+    calculate();
+  }
+
+  function removeRow(button) {
+    const row = button.closest('tr');
+    row.remove();
+    calculate();
+  }
+
+  function downloadPDF() {
+    const element = document.getElementById('receiptContent');
+    html2pdf().set({
+      margin: 0.5,
+      filename: `AfricTrails_Receipt_${document.getElementById("receiptNo").value || "download"}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    }).from(element).save();
+  }
+
+  calculate();
+</script>
+
+</body>
+</html>
